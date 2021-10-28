@@ -64,7 +64,14 @@ public final class BlobReader {
         try {
             int bytesRead = input.read(buffer);
             if (bytesRead != bytesToRead) {
-                return Optional.empty();
+                int bytesReadTotal = bytesRead;
+                while (input.available() > 0 && bytesReadTotal != bytesToRead && bytesRead > 0) {
+                    bytesRead = input.read(buffer, bytesReadTotal, bytesToRead - bytesReadTotal);
+                    bytesReadTotal += bytesRead;
+                }
+                if (bytesReadTotal != bytesToRead) {
+                    return Optional.empty();
+                }
             }
         } catch (IOException e) {
             log.error("Error reading from the stream: {}", e.getMessage(), e);
