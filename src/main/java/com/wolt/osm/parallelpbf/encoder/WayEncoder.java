@@ -74,7 +74,25 @@ public final class WayEncoder extends OsmEntityEncoder<Way> {
             way.addRefs(node - member);
             member = node;
         }
-        membersLength = membersLength + w.getNodes().size() * MEMBER_ENTRY_SIZE;
+        int memberMultiply = 1;
+        if (w.getLat().size() == w.getLon().size() && w.getLon().size() == w.getNodes().size()) {
+            long latVal = 0;
+            for (Double lat : w.getLat()) {
+                final long val = doubleToNanoScaled(lat / GRANULARITY);
+                way.addLat(val - latVal);
+                latVal = val;
+
+            }
+            long lonVal = 0;
+            for (Double lat : w.getLat()) {
+                final long val = doubleToNanoScaled(lat) / GRANULARITY;
+                way.addLon(val - lonVal);
+                lonVal = val;
+            }
+            memberMultiply += 2;
+        }
+
+        membersLength = membersLength + w.getNodes().size() * MEMBER_ENTRY_SIZE * memberMultiply;
 
         ways.addWays(way);
     }

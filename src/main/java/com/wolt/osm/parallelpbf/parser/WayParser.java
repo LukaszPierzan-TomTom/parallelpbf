@@ -29,13 +29,45 @@ import java.util.function.Consumer;
  */
 @Slf4j
 public final class WayParser extends BaseParser<Osmformat.Way, Consumer<Way>> {
+
+    /**
+     * Nano degrees scale.
+     */
+    private static final double NANO = .000000001;
+
+    /**
+     * Granularity, units of nanodegrees, used to store coordinates.
+     */
+    private final int granularity;
+
+    /**
+     * Offset value between the output coordinates coordinates and the granularity grid, in units of nanodegrees.
+     * Latitude part.
+     */
+    private final long latOffset;
+
+    /**
+     * Offset value between the output coordinates coordinates and the granularity grid, in units of nanodegrees.
+     * Longitude part.
+     */
+    private final long lonOffset;
+
     /**
      * Parent compatible constructor that sets callback and string table.
      * @param callback Callback to call on successful parse.
      * @param stringTable String table to use while parsing.
+     * @param granularityValue Grid granularity value.
+     * @param latOffsetValue Latitude offset of the grid.
+     * @param lonOffsetValue Longitude offset of the grid.
+     * @param
+     *
      */
-    public WayParser(final Consumer<Way> callback, final Osmformat.StringTable stringTable) {
+    public WayParser(final Consumer<Way> callback, final Osmformat.StringTable stringTable, final int granularityValue,
+                     final long latOffsetValue, final long lonOffsetValue) {
         super(callback, stringTable);
+        this.granularity = granularityValue;
+        this.latOffset = latOffsetValue;
+        this.lonOffset = lonOffsetValue;
     }
 
     @Override
@@ -47,6 +79,19 @@ public final class WayParser extends BaseParser<Osmformat.Way, Consumer<Way>> {
         for (Long node : message.getRefsList()) {
             nodeId += node;
             way.getNodes().add(nodeId);
+        }
+        if (message.getLatList().size() == message.getRefsList().size()
+            && message.getLatList().size() == message.getLonList().size()) {
+            long currentLat = 0L;
+            for (Long lat: message.getLatList()) {
+                currentLat += lat;
+                way.getLat().add(NANO * (latOffset + (granularity * currentLat)));
+            }
+            long currentLon = 0L;
+            for (Long lon: message.getLonList()) {
+                currentLon += lon;
+                way.getLon().add(NANO * (lonOffset + (granularity * currentLon)));
+            }
         }
         if (log.isDebugEnabled()) {
             log.debug(way.toString());

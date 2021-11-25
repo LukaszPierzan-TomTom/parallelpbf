@@ -49,4 +49,16 @@ public final class Way extends OsmEntity {
      * @see Node
      */
     private final List<Long> nodes = new LinkedList<>();
+
+    /**
+     * Ordered list of coordinate latitude, making way. Optional
+     *
+     */
+    private final List<Double> lat = new LinkedList<>();
+
+    /**
+     * Ordered list of coordinate longitude, making way. Optional
+     *
+     */
+    private final List<Double> lon = new LinkedList<>();
 }

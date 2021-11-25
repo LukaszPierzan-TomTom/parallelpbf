@@ -41,7 +41,7 @@ class WayParserTest {
 
     @Test
     void testWayParse() {
-        var testedObject = new WayParser(checker, TestObjectsFactory.stringTable);
+        var testedObject = new WayParser(checker, TestObjectsFactory.stringTable, 1, 0, 0);
         testedObject.parse(TestObjectsFactory.wayMessage);
     }
 }

@@ -116,7 +116,9 @@ public class OSMDataReader extends OSMReader {
                 }
             }
             if (waysCb != null) {
-                var parser = new WayParser(waysCb, stringTable);
+                var parser = new WayParser(waysCb, stringTable, primitives.getGranularity(),
+                                           primitives.getLatOffset(),
+                                           primitives.getLonOffset());
                 group.getWaysList().forEach(parser::parse);
             }
             if (relationsCb != null) {
